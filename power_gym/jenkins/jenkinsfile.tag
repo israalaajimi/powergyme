@@ -16,7 +16,8 @@ pipeline {
         }
         stage('Build') {
             steps {
-                bat "docker build -t devops-todo:${TAG} -f Dockerfile ."
+                bat docker.build("devops-todo:${GIT_COMMIT}", "-f power_gym/dockerfile power_gym")
+
             }
         }
         stage('Run (Docker)') {
