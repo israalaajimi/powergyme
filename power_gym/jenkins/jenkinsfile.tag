@@ -16,7 +16,7 @@ pipeline {
         }
         stage('Build') {
             steps {
-                bat docker.build "devops-todo:${GIT_COMMIT}", "-f Dockerfile ."
+                bat docker.build("devops-todo:${GIT_COMMIT}", "-f Dockerfile .")
 
             }
         }
