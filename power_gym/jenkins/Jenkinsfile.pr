@@ -47,4 +47,4 @@ pipeline {
             bat 'docker rm -f devops-todo-pr || exit 0'
         }
     }
-} //build 
+} }//build 
