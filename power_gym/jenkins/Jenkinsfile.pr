@@ -23,7 +23,7 @@ pipeline {
         stage('Build') {
             steps {
                 bat "set TAG=${GIT_COMMIT}"
-                bat "docker build -t power_gym:%TAG% -f dockerfile ."
+                bat docker build -t power_gym:${TAG} -f Dockerfile .
             }
         }
 
