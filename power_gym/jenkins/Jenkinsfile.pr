@@ -14,8 +14,8 @@ pipeline {
         }
         stage('Build') {
             steps {
-                bat docker.build("devops-todo:${GIT_COMMIT}", "-f Dockerfile .")
-
+                bat 'docker build -t devops-todo:${GIT_COMMIT} -f Dockerfile .'
+            }
         }
         stage('Run (Docker)') {
             steps {
@@ -23,11 +23,6 @@ pipeline {
                     docker rm -f devops-todo-pr || exit 0
                     docker run -d --name devops-todo-pr -p 3001:3000 devops-todo:pr
                 '''
-            }
-            post {
-                always {
-                    bat 'ping 127.0.0.1 -n 3 >nul'
-                }
             }
         }
         stage('Smoke Test') {
@@ -45,6 +40,7 @@ pipeline {
     post {
         always {
             bat 'docker rm -f devops-todo-pr || exit 0'
+            bat 'ping 127.0.0.1 -n 3 >nul'
         }
     }
-} }//build 
+}
