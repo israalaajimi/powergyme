@@ -22,7 +22,8 @@ pipeline {
         stage('Build') {
             steps {
                 bat """
-                    docker build -t power_gym:${TAG} -f dockerfile .
+                  docker build -t power_gym:${TAG} -f Dockerfile .
+
                 """
             }
         }
