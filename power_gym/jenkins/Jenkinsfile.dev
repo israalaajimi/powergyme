@@ -1,28 +1,35 @@
 pipeline {
     agent any
+
     stages {
+
         stage('Checkout') {
             steps {
                 checkout scm
             }
         }
+
         stage('Setup') {
             steps {
                 bat 'echo Setup: node version'
                 bat 'node -v || exit 0'
             }
         }
+
         stage('Build') {
             steps {
-                bat docker.build("devops-todo:${GIT_COMMIT}", "-f Dockerfile .")
-
+                bat """
+                    docker build -t power_gym:${GIT_COMMIT} -f dockerfile .
+                """
+            }
         }
+
         stage('Run (Docker)') {
             steps {
-                bat '''
-                    docker rm -f devops-todo-pr || exit 0
-                    docker run -d --name devops-todo-pr -p 3001:3000 devops-todo:pr
-                '''
+                bat """
+                    docker rm -f power_gym-dev || exit 0
+                    docker run -d --name power_gym-dev -p 3001:80 power_gym:${GIT_COMMIT}
+                """
             }
             post {
                 always {
@@ -30,11 +37,13 @@ pipeline {
                 }
             }
         }
+
         stage('Smoke Test') {
             steps {
                 bat 'scripts/smoke.bat http://localhost:3001'
             }
         }
+
         stage('Archive Artifacts') {
             steps {
                 bat 'echo Archiving logs and smoke result > smoke_result.txt'
@@ -42,9 +51,10 @@ pipeline {
             }
         }
     }
+
     post {
         always {
-            bat 'docker rm -f devops-todo-pr || exit 0'
+            bat 'docker rm -f power_gym-dev || exit 0'
         }
     }
-}}
+}
