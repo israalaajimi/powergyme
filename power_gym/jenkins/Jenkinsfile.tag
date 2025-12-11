@@ -19,14 +19,13 @@ pipeline {
             }
         }
 
-        stage('Build') {
-            steps {
-                bat """
-             docker build -t power_gym:$TAG -f power_gym/Dockerfile power_gym
+       stage('Build') {
+    bat """
+    set TAG=%GIT_COMMIT%
+    docker build -t power_gym:%TAG% -f power_gym/Dockerfile power_gym
+    """
+}
 
-
-                """
-            }
         }
 
         stage('Run (Docker)') {
