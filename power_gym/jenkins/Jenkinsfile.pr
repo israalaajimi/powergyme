@@ -1,5 +1,9 @@
 pipeline {
     agent any
+    environment {
+        // نجيب commit الحالي باش نستعمله في Docker tag
+        TAG = "${GIT_COMMIT}"
+    }
     stages {
         stage('Checkout') {
             steps {
@@ -14,14 +18,16 @@ pipeline {
         }
         stage('Build') {
             steps {
-                bat 'docker build -t devops-todo:${GIT_COMMIT} -f Dockerfile .'
+                // نبدّل GIT_COMMIT باش يكون صالح في Windows batch
+                bat 'set TAG=%GIT_COMMIT%'
+                bat 'docker build -t devops-todo:%TAG% -f Dockerfile .'
             }
         }
         stage('Run (Docker)') {
             steps {
                 bat '''
                     docker rm -f devops-todo-pr || exit 0
-                    docker run -d --name devops-todo-pr -p 3001:3000 devops-todo:pr
+                    docker run -d --name devops-todo-pr -p 3001:3000 devops-todo:%TAG%
                 '''
             }
         }
