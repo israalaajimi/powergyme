@@ -22,39 +22,38 @@ pipeline {
 
         stage('Build') {
             steps {
-                bat "set TAG=${GIT_COMMIT}"
-                bat "docker build -t power_gym:%TAG% -f dockerfile ."
+                bat 'set TAG=%GIT_COMMIT%'
+                bat 'docker build -t power_gym:%TAG% -f Dockerfile .'
             }
         }
 
         stage('Run (Docker)') {
             steps {
-                bat """
+                bat '''
                     docker rm -f power_gym-pr || exit 0
-                    docker run -d --name power_gym-pr -p 3001:80 power_gym:%TAG%
-                """
+                    docker run -d --name power_gym-pr -p 3001:3000 power_gym:%TAG%
+                '''
             }
         }
 
         stage('Smoke Test') {
             steps {
-                bat "scripts/smoke.bat http://localhost:3001"
+                bat 'scripts/smoke.bat http://localhost:3001'
             }
         }
 
         stage('Archive Artifacts') {
             steps {
-                bat "echo Archiving logs and smoke result > smoke_result.txt"
-                archiveArtifacts artifacts: "smoke_result.txt", fingerprint: true
+                bat 'echo Archiving logs and smoke result > smoke_result.txt'
+                archiveArtifacts artifacts: 'smoke_result.txt', fingerprint: true
             }
         }
     }
 
     post {
         always {
-            bat "docker rm -f power_gym-pr || exit 0"
-            bat "ping 127.0.0.1 -n 3 >nul"
+            bat 'docker rm -f power_gym-pr || exit 0'
+            bat 'ping 127.0.0.1 -n 3 >nul'
         }
     }
 }
-

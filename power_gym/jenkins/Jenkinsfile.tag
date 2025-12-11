@@ -15,15 +15,13 @@ pipeline {
 
         stage('Setup') {
             steps {
-                bat "echo Tag build: ${TAG}"
+                bat "echo Tag build for: ${TAG}"
             }
         }
 
         stage('Build') {
             steps {
-                bat """
-                    docker build -t power_gym:${TAG} -f dockerfile .
-                """
+                bat 'docker build -t power_gym:%TAG% -f Dockerfile .'
             }
         }
 
@@ -31,7 +29,7 @@ pipeline {
             steps {
                 bat """
                     docker rm -f power_gym-tag || exit 0
-                    docker run -d --name power_gym-tag -p 3003:80 power_gym:${TAG}
+                    docker run -d --name power_gym-tag -p 3003:3000 power_gym:%TAG%
                 """
             }
         }
@@ -44,8 +42,8 @@ pipeline {
 
         stage('Archive Artifacts') {
             steps {
-                bat "docker image save power_gym:${TAG} -o power_gym-${TAG}.tar || exit 0"
-                archiveArtifacts artifacts: "power_gym-${TAG}.tar,**/smoke_result.txt", fingerprint: true
+                bat "docker image save power_gym:%TAG% -o power_gym-%TAG%.tar || exit 0"
+                archiveArtifacts artifacts: "power_gym-%TAG%.tar,**/smoke_result.txt", fingerprint: true
             }
         }
     }
