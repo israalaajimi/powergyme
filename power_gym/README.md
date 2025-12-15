@@ -138,3 +138,4 @@ Works on all modern browsers that support:
 - ES6+ JavaScript
 - LocalStorage API
 - CSS Grid and Flexbox
+Test change for smoke pipeline
