@@ -1,0 +1,64 @@
+pipeline {
+    agent any
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Setup') {
+            steps {
+                bat 'echo Setup: node version'
+                bat 'node -v || exit 0'
+            }
+        }
+
+      stage('Build') {
+    bat """
+    set TAG=%GIT_COMMIT%
+    docker build -t power_gym:%TAG% -f power_gym/Dockerfile power_gym
+    """
+}
+
+        }
+
+        stage('Run (Docker)') {
+            steps {
+                bat """
+                    docker rm -f power_gym-dev || exit 0
+                    docker run -d --name power_gym-dev -p 3001:80 power_gym:${GIT_COMMIT}
+                """
+            }
+            post {
+                always {
+                    bat 'ping 127.0.0.1 -n 3 >nul'
+                }
+            }
+        }
+
+        stage('Smoke Test') {
+            steps {
+                bat 'scripts/smoke.bat http://localhost:3001'
+            }
+        }
+
+        stage('Archive Artifacts') {
+            steps {
+                bat 'echo Archiving logs and smoke result > smoke_result.txt'
+                archiveArtifacts artifacts: 'smoke_result.txt', fingerprint: true
+            }
+        }
+    }
+
+    post {
+        always {
+            bat 'docker rm -f power_gym-dev || exit 0'
+        }
+    }
+}
+
+    }
+}
