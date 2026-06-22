@@ -143,4 +143,4 @@ Works on all modern browsers that support:
 
 This project uses client-side only auth and storage (hardcoded credentials + localStorage) on purpose, to keep the focus on React patterns (Context API, protected routes, CRUD, forms) without needing a backend. For a production version, the next step would be replacing `AuthContext` with a real auth provider (JWT / session-based) and `BooksContext` with API calls to a backend (Node/Express, etc.).
 
-israa laajimi hiya w yassmine yit3almo .
+israa w yassmine yit3almo fi devops 
